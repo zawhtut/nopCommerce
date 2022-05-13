@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Net.Http.Headers;
@@ -64,13 +65,6 @@ namespace Nop.Web.Framework.Infrastructure.Extensions
                 var pluginService = engine.Resolve<IPluginService>();
                 pluginService.InstallPluginsAsync().Wait();
                 pluginService.UpdatePluginsAsync().Wait();
-
-                //update nopCommerce core and db
-                var migrationManager = engine.Resolve<IMigrationManager>();
-                var assembly = Assembly.GetAssembly(typeof(ApplicationBuilderExtensions));
-                migrationManager.ApplyUpMigrations(assembly, MigrationProcessType.Update);
-                assembly = Assembly.GetAssembly(typeof(IMigrationManager));
-                migrationManager.ApplyUpMigrations(assembly, MigrationProcessType.Update);
 
                 var taskScheduler = engine.Resolve<ITaskScheduler>();
                 taskScheduler.InitializeAsync().Wait();

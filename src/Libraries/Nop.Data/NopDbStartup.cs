@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Reflection;
 using FluentMigrator;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Conventions;
@@ -25,6 +26,14 @@ namespace Nop.Data
         /// <param name="configuration">Configuration of the application</param>
         public void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
+            //data layer
+            services.AddTransient<IDataProviderManager, DataProviderManager>();
+            services.AddTransient(serviceProvider =>
+                serviceProvider.GetRequiredService<IDataProviderManager>().DataProvider);
+
+            //repositories
+            services.AddScoped(typeof(IRepository<>), typeof(EntityRepository<>));
+
             var typeFinder = Singleton<ITypeFinder>.Instance;
             var mAssemblies = typeFinder.FindClassesOfType<MigrationBase>()
                 .Select(t => t.Assembly)
@@ -53,6 +62,12 @@ namespace Nop.Data
         /// <param name="application">Builder for configuring an application's request pipeline</param>
         public void Configure(IApplicationBuilder application)
         {
+            //update nopCommerce core and db
+            var migrationManager = application.ApplicationServices.GetService<IMigrationManager>();
+            var assembly = Assembly.GetAssembly(typeof(ApplicationBuilderExtensions));
+            migrationManager.ApplyUpMigrations(assembly, MigrationProcessType.Update);
+            assembly = Assembly.GetAssembly(typeof(IMigrationManager));
+            migrationManager.ApplyUpMigrations(assembly, MigrationProcessType.Update);
         }
 
         /// <summary>
