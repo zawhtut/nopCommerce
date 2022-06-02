@@ -175,6 +175,20 @@ namespace Nop.Web.Framework.Migrations.UpgradeTo460
                 settingService.SaveSettingAsync(catalogSettings, settings => settings.ProductUrlStructureTypeId).Wait();
             }
 
+            //#5570
+            var sitemapXmlSettings = settingService.LoadSettingAsync<SitemapXmlSettings>().Result;
+
+            if (!settingService.SettingExistsAsync(sitemapXmlSettings, settings => settings.RebuildSitemapXMLAfterDays).Result)
+            {
+                sitemapXmlSettings.RebuildSitemapXMLAfterDays = 2;
+                settingService.SaveSettingAsync(sitemapXmlSettings, settings => settings.RebuildSitemapXMLAfterDays).Wait();
+            }
+
+            if (!settingService.SettingExistsAsync(sitemapXmlSettings, settings => settings.SitemapBuildOperationDelay).Result)
+            {
+                sitemapXmlSettings.SitemapBuildOperationDelay = 60;
+                settingService.SaveSettingAsync(sitemapXmlSettings, settings => settings.SitemapBuildOperationDelay).Wait();
+            }
         }
 
         public override void Down()

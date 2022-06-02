@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using Nop.Web.Models.Sitemap;
 
@@ -29,7 +30,7 @@ namespace Nop.Web.Factories
         /// A task that represents the asynchronous operation
         /// The task result contains the sitemap model with sitemap.xml as string
         /// </returns>
-        Task<SitemapXmlModel> PrepareSitemapXmlModelAsync(int? id);
+        Task<SitemapXmlModel> PrepareSitemapXmlModelAsync(int id = 0);
 
         /// <summary>
         /// Prepare localized sitemap URL model
